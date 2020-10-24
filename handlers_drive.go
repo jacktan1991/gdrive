@@ -9,15 +9,30 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/prasmussen/gdrive/auth"
-	"github.com/prasmussen/gdrive/cli"
-	"github.com/prasmussen/gdrive/drive"
+	"github.com/jacktan1991/gdrive/auth"
+	"github.com/jacktan1991/gdrive/cli"
+	"github.com/jacktan1991/gdrive/drive"
 )
 
-const ClientId = "367116221053-7n0vf5akeru7on6o2fjinrecpdoe99eg.apps.googleusercontent.com"
-const ClientSecret = "1qsNodXNaWq1mQuBjUjmvhoO"
-const TokenFilename = "token_v2.json"
+const ClientIdKey = "CLIENT_ID"
+const ClientSecretKey = "CLIENT_SECRET"
+const TokenFilename = "token.json"
 const DefaultCacheFileName = "file_cache.json"
+
+
+// get google client id and secret from env or return default if not exist
+func GetClientConf() (string, string) {
+    clientId, has := os.LookupEnv(ClientIdKey)
+    if !has{
+        clientId = "584218912751-t001ckemf9i12e435dp87r1l0n57uckp.apps.googleusercontent.com"
+    }
+    clientSecret, has := os.LookupEnv(ClientSecretKey)
+    if !has{
+        clientSecret = "buEYToipxdCnq7fCTYjG05dQ"
+    }
+
+    return clientId, clientSecret
+}
 
 func listHandler(ctx cli.Context) {
 	args := ctx.Args()
@@ -345,12 +360,14 @@ func getOauthClient(args cli.Arguments) (*http.Client, error) {
 		ExitF("Access token not needed when refresh token is provided")
 	}
 
+    clientId, clientSecret := GetClientConf()
+
 	if args.String("refreshToken") != "" {
-		return auth.NewRefreshTokenClient(ClientId, ClientSecret, args.String("refreshToken")), nil
+		return auth.NewRefreshTokenClient(clientId, clientSecret, args.String("refreshToken")), nil
 	}
 
 	if args.String("accessToken") != "" {
-		return auth.NewAccessTokenClient(ClientId, ClientSecret, args.String("accessToken")), nil
+		return auth.NewAccessTokenClient(clientId, clientSecret, args.String("accessToken")), nil
 	}
 
 	configDir := getConfigDir(args)
@@ -365,7 +382,7 @@ func getOauthClient(args cli.Arguments) (*http.Client, error) {
 	}
 
 	tokenPath := ConfigFilePath(configDir, TokenFilename)
-	return auth.NewFileSourceClient(ClientId, ClientSecret, tokenPath, authCodePrompt)
+	return auth.NewFileSourceClient(clientId, clientSecret, tokenPath, authCodePrompt)
 }
 
 func getConfigDir(args cli.Arguments) string {

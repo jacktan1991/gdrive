@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/prasmussen/gdrive/cli"
+	"github.com/jacktan1991/gdrive/cli"
 	"os"
 	"runtime"
 	"strings"
