@@ -23,11 +23,11 @@ const DefaultCacheFileName = "file_cache.json"
 // get google client id and secret from env or return default if not exist
 func GetClientConf() (string, string) {
     clientId, has := os.LookupEnv(ClientIdKey)
-    if !has{
+    if (!has || len(clientId) < 1) {
         clientId = "584218912751-t001ckemf9i12e435dp87r1l0n57uckp.apps.googleusercontent.com"
     }
     clientSecret, has := os.LookupEnv(ClientSecretKey)
-    if !has{
+    if (!has || len(clientSecret) < 1) {
         clientSecret = "buEYToipxdCnq7fCTYjG05dQ"
     }
 
